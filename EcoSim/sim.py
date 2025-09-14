@@ -50,6 +50,6 @@ class Sim:
             self.tick_timer.update()
 
             pygame.display.flip()
-            self.delta_time = self.clock.tick(self.config.fps) / 1000
+            self.dt = self.clock.tick(self.config.fps) / 1000
 
         return "exit"
