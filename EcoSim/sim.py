@@ -18,7 +18,7 @@ class Sim:
         self.display = pygame.display.get_surface()
         self.entities = pygame.sprite.Group()
         self.update_sprites = pygame.sprite.Group()
-        self.mouse = Mouse()
+        self.mouse = Mouse(self.entities)
 
         self.ticks = 0
         self.speed_multiplier = 1.0 # 1 = Normal speed, play with it
@@ -44,6 +44,18 @@ class Sim:
 
     def debug_info(self) -> None:
         debug_text(self.display, f"FPS: {self.clock.get_fps():.0f}", (10, 10), bg_color=(0, 0, 0, 150))
+
+        entity = self.mouse.get_hovered_entity()
+        if entity is not None:
+            debug_text(self.display, f"Name: {entity.name}", (10, 40), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Health: {entity.health:.0f}", (10, 65), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Energy: {entity.energy:.0f}", (10, 90), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Hunger: {entity.hunger:.0f}", (10, 115), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Thirst: {entity.thirst:.0f}", (10, 140), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Age: {entity.age:.1f}s", (10, 165), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Position: ({entity.position.x:.0f}, {entity.position.y:.0f})", (10, 190), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Speed: {entity.speed:.0f}px/s", (10, 215), bg_color=(0, 0, 0, 150))
+            debug_text(self.display, f"Ticks: {self.ticks}", (10, 240), bg_color=(0, 0, 0, 150))
 
     def run(self) -> str:
         while self.running:
