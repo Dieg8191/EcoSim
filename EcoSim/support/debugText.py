@@ -1,18 +1,45 @@
 import pygame
 
-def debug_text( #! TODO: implement text cache for better performance
-        surface: pygame.Surface,
+class DebugText:
+    def __init__(self) -> None:
+        self.display = pygame.display.get_surface()
+        self.font = pygame.font.SysFont(None, 25)
+        self.cache = {}
+
+    def render_text(self, text: str, color: str | tuple[int, int, int] = "white") -> list[pygame.surface.Surface]:
+        rendered_text = []
+
+        for char in text:
+            if not char in self.cache:
+                rendered_char = self.font.render(char, True, color)
+                self.cache[char] = rendered_char
+            else:
+                rendered_char = self.cache[char]
+
+            rendered_text.append(rendered_char)
+
+        return rendered_text
+                
+    def draw(
+        self,
         text: str,
-        pos: tuple[int, int],
-        color: str | tuple[int] = "white",
-        font_size: int = 25,
-        bg_color: str | tuple[int, int, int] = None) -> None:
-    
-    font = pygame.font.SysFont(None, font_size)
-    text_surface = font.render(text, True, color)
+        pos: tuple[int, int] | pygame.Vector2,
+        bg_color: str | tuple[int, int, int] | None = "black",
+        font_color: str | tuple[int, int, int] = "white",
+        padding: int = 4
+    ) -> None:
+        rendered_text = self.render_text(text, font_color)
+        x, y = pos
 
-    if bg_color is not None:
-        text_rect = text_surface.get_rect(topleft=pos)
-        pygame.draw.rect(surface, bg_color, text_rect)
+        if bg_color:
+            total_width = sum(char.get_width() for char in rendered_text)
+            max_height = max(char.get_height() for char in rendered_text)
+            rect = pygame.Rect(x, y, total_width + padding * 2, max_height + padding * 2)
+            pygame.draw.rect(self.display, bg_color, rect)
 
-    surface.blit(text_surface, pos)
+        x_offset = x + padding
+        y_offset = y + padding
+        for char in rendered_text:
+            char_rect = char.get_rect(topleft=(x_offset, y_offset))
+            self.display.blit(char, char_rect)
+            x_offset += char.get_width()
