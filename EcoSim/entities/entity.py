@@ -1,8 +1,9 @@
 import pygame
 from pygame import Vector2
+from abc import ABC, abstractmethod
 
 
-class Entity(pygame.sprite.Sprite):
+class Entity(pygame.sprite.Sprite, ABC):
     def __init__(self, group: pygame.sprite.Group = None, pos: Vector2 = None) -> None:
         super().__init__(group)
         self.name = "Entity"
@@ -20,13 +21,18 @@ class Entity(pygame.sprite.Sprite):
         else:
             self.position = Vector2(pos.x, pos.y)
 
-        self.size = 20 # radius for circular representation
+        self.size = 15 # radius for circular representation
         self.image = pygame.Surface((self.size * 2, self.size * 2))
+        self.draw_circle("blue")
         self.image.set_colorkey((0, 0, 0)) # Set black as transparent
-        pygame.draw.circle(self.image, "green", (self.size, self.size), self.size) # Green circle
+        
 
         self.rect = self.image.get_rect(topleft=self.position)
 
+    def draw_circle(self, color: str | tuple[int]) -> None:
+        pygame.draw.circle(self.image, color, (self.size, self.size), self.size)
+
+    @abstractmethod
     def update(self, **kwargs) -> None:
         # Update entity age
         dt = kwargs.get("dt", 0)

@@ -2,7 +2,7 @@ import pygame
 from .entities.entity import Entity
 from .support.timer import Timer
 from .config import Config 
-
+from .entities.animal import Animal
 class Sim:
     def __init__(self) -> None:
         self.running = True
@@ -18,7 +18,7 @@ class Sim:
         self.dt = 0
         self.get_dt = lambda: self.dt * self.speed_multiplier
         
-        Entity(self.entities)
+        Animal(self.entities)
         self.tick_timer = Timer(self.get_dt, target_time=self.config.tick_rate, trigger=self.tick, repeat=True)
 
     def tick(self) -> None:
@@ -26,7 +26,6 @@ class Sim:
 
     def update(self) -> None:
         dt = self.get_dt()
-        print(dt)
 
         for entity in self.entities:
             entity.update(dt=dt)
