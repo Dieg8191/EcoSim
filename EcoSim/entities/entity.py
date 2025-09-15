@@ -21,23 +21,33 @@ class Entity(pygame.sprite.Sprite, ABC):
         else:
             self.position = Vector2(pos.x, pos.y)
 
-        self.size = 15 # radius for circular representation
-        self.image = pygame.Surface((self.size * 2, self.size * 2))
-        self.draw_circle("blue")
-        self.image.set_colorkey((0, 0, 0)) # Set black as transparent
-        
+        self.set_circle(10, "blue")
 
+    def set_circle(self, size: int, color: str | tuple[int]) -> None:
+        self.image = pygame.Surface((size * 2, size * 2))
         self.rect = self.image.get_rect(topleft=self.position)
 
-    def draw_circle(self, color: str | tuple[int]) -> None:
-        pygame.draw.circle(self.image, color, (self.size, self.size), self.size)
+        pygame.draw.circle(self.image, color, (size, size), size)
+        self.image.set_colorkey((0, 0, 0)) # Set black as transparent
 
     @abstractmethod
     def update(self, **kwargs) -> None:
         # Update entity age
         dt = kwargs.get("dt", 0)
-        self.age += dt
 
         # update rect position
         self.rect.topleft = self.position
+
+    def tick_update(self) -> None:
+        # Update hunger and thirst over time
+        self.hunger += 0.1
+        self.thirst += 0.1
+
+        # Decrease health if hunger or thirst exceed certain thresholds
+        if self.hunger > 100:
+            self.health -= 1
+        if self.thirst > 100:
+            self.health -= 1
         
+        if self.health <= 0:
+            self.kill()
