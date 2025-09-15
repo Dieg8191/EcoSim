@@ -45,9 +45,9 @@ class Entity(pygame.sprite.Sprite, ABC):
 
         # Decrease health if hunger or thirst exceed certain thresholds
         if self.hunger > 100:
-            self.health -= 1
+            self.health -= 0.5
         if self.thirst > 100:
-            self.health -= 1
+            self.health -= 0.5
         
         if self.health <= 0:
             self.kill()

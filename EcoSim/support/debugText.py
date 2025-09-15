@@ -1,6 +1,6 @@
 import pygame
 
-def debug_text(
+def debug_text( #! TODO: implement text cache for better performance
         surface: pygame.Surface,
         text: str,
         pos: tuple[int, int],
