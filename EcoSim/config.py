@@ -2,7 +2,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Config:
-    fps: int = 60
+    fps: int = 60000
     width: int = 800
     height: int = 600
     window_title: str = "EcoSim"

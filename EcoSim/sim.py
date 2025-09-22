@@ -6,14 +6,14 @@ from .config import Config
 from .entities.animal import Animal
 from .entities.plant import Plant
 from .support.mouse import Mouse
-from .support.debugText import DebugText
+from .support.debugTextRenderer import DebugTextRenderer
 
 
 class Sim:
     def __init__(self) -> None:
         self.running = True
         self.debug = True
-        self.debug_text = DebugText()
+        self.debug_text = DebugTextRenderer()
         self.clock = pygame.time.Clock()
         self.config = Config()
 
@@ -31,7 +31,9 @@ class Sim:
         Animal(self.entities)
         Plant(self.entities, pygame.Vector2(100, 100))
 
-        self.tick_timer = Timer(self.get_dt, target_time=self.config.tick_rate, trigger=self.tick, repeat=True)
+        self.tick_timer = Timer(self.get_dt, target_time=self.config.tick_rate, trigger=self.tick)
+        self.render_debug_info()
+        self.update_debug_text = Timer(self.get_dt, target_time=0.2, trigger=self.render_debug_info)
 
     def tick(self) -> None:
         self.ticks += 1
@@ -47,20 +49,20 @@ class Sim:
     def draw(self) -> None:
         self.entities.draw(self.display)
 
-    def debug_info(self) -> None:
-        self.debug_text.draw(f"FPS: {self.clock.get_fps():.0f}, TPS: {self.ticks / (time() - self.sim_start_time):0.2f}", (10, 10), bg_color=(0, 0, 0, 150))
+    def render_debug_info(self) -> None:
+        self.debug_text.clear()
+        self.debug_text.render(f"FPS: {self.clock.get_fps():.0f}, TPS: {self.ticks / (time() - self.sim_start_time):0.2f}", (10, 10), bg_color=(0, 0, 0, 150))
 
         entity = self.mouse.get_hovered_entity()
         if entity is not None:
-            self.debug_text.draw(f"Name: {entity.name}", (10, 40), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Health: {entity.health:.0f}", (10, 65), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Energy: {entity.energy:.1f}", (10, 90), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Hunger: {entity.hunger:.1f}", (10, 115), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Thirst: {entity.thirst:.1f}", (10, 140), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Age: {entity.age:.0f}s", (10, 165), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Position: ({entity.position.x:.0f}, {entity.position.y:.0f})", (10, 190), bg_color=(0, 0, 0, 150))
-            self.debug_text.draw(f"Tick age: {self.ticks}", (10, 190 + 25), bg_color=(0, 0, 0, 150))
-            
+                self.debug_text.render(f"Name: {entity.name}", (10, 40), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Health: {entity.health:.0f}", (10, 65), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Energy: {entity.energy:.1f}", (10, 90), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Hunger: {entity.hunger:.1f}", (10, 115), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Thirst: {entity.thirst:.1f}", (10, 140), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Age: {entity.age:.0f}s", (10, 165), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Position: ({entity.position.x:.0f}, {entity.position.y:.0f})", (10, 190), bg_color=(0, 0, 0, 150))
+                self.debug_text.render(f"Tick age: {self.ticks}", (10, 190 + 25), bg_color=(0, 0, 0, 150))
 
     def run(self) -> str:
         while self.running:
@@ -81,7 +83,9 @@ class Sim:
             self.draw()
 
             # show debug info
-            if self.debug: self.debug_info()
+            if self.debug:
+                self.update_debug_text.update()
+                self.debug_text.draw_cache()
 
             #run tick timer
             self.tick_timer.update()
